@@ -142,15 +142,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="src\Shader\Shader.cpp" />
     <ClCompile Include="vendor\glad.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Shader\Shader.h" />
     <ClInclude Include="vendor\glad\glad.h" />
     <ClInclude Include="vendor\GLFW\glfw3.h" />
     <ClInclude Include="vendor\GLFW\glfw3native.h" />
     <ClInclude Include="vendor\KHR\khrplatform.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\basic.shader" />
     <None Include="vendor\GLFW\glfw3.dll" />
   </ItemGroup>
   <ItemGroup>

@@ -6,30 +6,6 @@
 unsigned int SCR_WIDTH = 1280;
 unsigned int SCR_HEIGHT = 720;
 
-const char* vertexShaderSource = 
-"#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"layout (location = 1) in vec3 aColor;\n"
-"layout (location = 2) in vec2 aTexCoord;\n"
-"out vec3 ourColor;\n"
-"out vec2 TexCoord;\n"
-"void main()\n"
-"{\n"
-"	gl_Position = vec4(aPos, 1.0);\n"
-"   ourColor = aColor;\n"
-"   TexCoord = aTexCoord;\n"
-"}\n";
-
-const char* fragmentShaderSource = 
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"in vec3 ourColor;\n"
-"in vec2 TexCoord;\n"
-"uniform sampler2D ourTexture;\n"
-"void main()\n"
-"{\n"
-"   FragColor = texture(ourTexture, TexCoord);\n"
-"}\n";
 
 void processInput(GLFWwindow* window)
 {
@@ -69,7 +45,7 @@ int main() {
 	auto data = new GLubyte[720][1280][4];
 	for (int i = 0; i < SCR_HEIGHT; i++) {
 		for (int j = 0; j < SCR_WIDTH; j++) {
-			unsigned int color = 0x8a16c4ff;
+			unsigned int color = 0x8a1600ff;
 			GLubyte red = (color & 0xff000000) >> (6 * 4);
 			GLubyte green = (color & 0x00ff0000) >> (4 * 4);
 			GLubyte blue = (color & 0x0000ff00) >> (4 * 2);
@@ -82,67 +58,28 @@ int main() {
 		}
 	}
 
-	//create shaders and shader program
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	unsigned int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	//vertices for main quad
-	float vertices[] = {
-		-1.0f,  1.0f, 0.0f,	1.0f, 1.0f, 0.0f, 0.0f, 1.0f,//top left
-		 1.0f,  1.0f, 0.0f,	1.0f, 0.0f, 0.0f, 1.0f, 1.0f,//top right
-		-1.0f, -1.0f, 0.0f,	0.0f, 0.0f, 1.0f, 0.0f, 0.0f,//bottom left
-		 1.0f, -1.0f, 0.0f,	0.0f, 1.0f, 0.0f, 1.0f, 0.0f//bottom right
-	};
-
-	unsigned int indices[] = {
-		0, 3, 2,
-		0, 1, 3
-	};
-
-	//creating objects for quad rendering
-	unsigned int VBO, VAO, EBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// texture coord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	//texture creation
+	//data alignment stuff
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+	//texture creation stuff
 	unsigned int texture;
 	glGenTextures(1, &texture);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	
+
+	//sets the data of the texture
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_RGBA,
+		SCR_WIDTH,
+		SCR_HEIGHT,
+		0,
+		GL_RGBA,
+		GL_UNSIGNED_BYTE,
+		data
+	);
+
 	// set texture wrapping to GL_REPEAT (default wrapping method)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -150,26 +87,30 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	//sets the data of the texture
-	glTexImage2D(
-		GL_TEXTURE_2D,
-		0, 
-		GL_RGBA, 
-		SCR_WIDTH, 
-		SCR_HEIGHT, 
-		0, 
-		GL_RGBA, 
-		GL_UNSIGNED_BYTE, 
-		data
-	);
-
+	//generates texture mipmap
 	glGenerateMipmap(GL_TEXTURE_2D);
+
+	//creates framebuffer and attaches previous texture to it
+	unsigned int framebuffer;
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glFramebufferTexture(
+		GL_FRAMEBUFFER, 
+		GL_COLOR_ATTACHMENT0,
+		texture, 
+		0);
 
 	//main application loop
 	while (!glfwWindowShouldClose(window)) {
 
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//reads data from created framebuffer to the default one, rendering the pixel data on the screen
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBlitFramebuffer(
+		0, 0, SCR_WIDTH, SCR_HEIGHT,
+		0, 0, SCR_WIDTH, SCR_HEIGHT,
+		GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
 
 		//update the image on the screen
 		glTexSubImage2D(
@@ -183,13 +124,6 @@ int main() {
 			GL_UNSIGNED_BYTE,
 			data
 		);
-
-		glBindTexture(GL_TEXTURE_2D, texture);
-
-		//drawing the quad to fill the screen
-		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		processInput(window);
 

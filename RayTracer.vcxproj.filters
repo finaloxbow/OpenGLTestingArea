@@ -21,6 +21,9 @@
     <ClCompile Include="vendor\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Shader\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vendor\GLFW\glfw3.h">
@@ -35,9 +38,13 @@
     <ClInclude Include="vendor\KHR\khrplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Shader\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="vendor\GLFW\glfw3.dll" />
+    <None Include="res\basic.shader" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="vendor\GLFW\glfw3.lib" />
