@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include "Utils.h"
+
 
 class Ray {
 public:
@@ -12,8 +14,6 @@ public:
 	glm::vec3 direction();
 
 	glm::vec3 at(double t) const;
-
-	glm::vec3 ray_color();
 
 	float hit_sphere(const glm::vec3& center, float radius);
 

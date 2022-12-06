@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 class Renderer {
 public:
@@ -12,6 +13,7 @@ public:
 		GLFWwindow* window);
 
 	void updatePixel(unsigned int x, unsigned int y, unsigned int rgbaVal);
+	void updatePixel(unsigned int x, unsigned int y, glm::vec4& rgba, int samples_per_pixel);
 	void swap_buffers(unsigned int drawBuffer);
 	unsigned int getBufferWidth();
 	unsigned int getBufferHeight();

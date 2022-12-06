@@ -1,5 +1,6 @@
 #include "Renderer.h"
 
+#include "Utils.h"
 
 Renderer::Renderer(unsigned int framebuffer_width, unsigned int framebuffer_height, unsigned int channels, GLFWwindow* window)
 	: m_framebuffer_width(framebuffer_width), m_framebuffer_height(framebuffer_height),  m_channels(channels), m_window(window) {
@@ -28,6 +29,24 @@ void Renderer::updatePixel(unsigned int x, unsigned int y, unsigned int rgbaVal)
 		m_framebuffer[x * m_framebuffer_width * 4 + y * 4 + 2] = blue;
 		m_framebuffer[x * m_framebuffer_width * 4 + y * 4 + 3] = alpha;
 	}
+}
+
+void Renderer::updatePixel(unsigned int x, unsigned int y, glm::vec4& rgba, int samples_per_pixel)
+{
+	auto red = rgba.x;
+	auto green = rgba.y;
+	auto blue = rgba.z;
+	auto alpha = rgba.t;
+
+	auto scale = 1.0f / samples_per_pixel;
+	red *= scale;
+	green *= scale;
+	blue *= scale;
+
+	m_framebuffer[x * m_framebuffer_width * 4 + y * 4 + 0] = static_cast<int>(256 * clamp(red, 0.0f, 0.999f));
+	m_framebuffer[x * m_framebuffer_width * 4 + y * 4 + 1] = static_cast<int>(256 * clamp(green, 0.0f, 0.999f));
+	m_framebuffer[x * m_framebuffer_width * 4 + y * 4 + 2] = static_cast<int>(256 * clamp(blue, 0.0f, 0.999f));
+	m_framebuffer[x * m_framebuffer_width * 4 + y * 4 + 3] = static_cast<int>(256 * clamp(alpha, 0.0f, 0.999f));
 }
 
 void Renderer::swap_buffers(unsigned int drawBuffer)

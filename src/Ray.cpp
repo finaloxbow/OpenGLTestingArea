@@ -18,19 +18,6 @@ glm::vec3 Ray::at(double t) const
     return orig + glm::vec3(dir.x * t, dir.y * t, dir.z * t);
 }
 
-glm::vec3 Ray::ray_color() {
-	auto t = hit_sphere(glm::vec3(0, 0, -1), 0.5f);
-	if (t > 0) {
-		glm::vec3 normal = glm::normalize(at(t) - glm::vec3(0, 0, -1));
-		return 0.5f * (normal + glm::vec3(1, 1, 1));
-	}
-
-	glm::vec3 unit_direction = glm::normalize(dir);
-	t = 0.5f * (unit_direction.y + 1.0f);
-	//linear interpolation between the two colors
-	return (1.0f - t) * glm::vec3(1.0, 1.0, 1.0) + t * glm::vec3(0.5, 0.7, 1.0);
-}
-
 //converts an RGB vec3 to a uint_32 representing the RGBA value
 //alpha always set to 1
 unsigned int Ray::vec3ToRGBA(glm::vec3& pixel_color) {
