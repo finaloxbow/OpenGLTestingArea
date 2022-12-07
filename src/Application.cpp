@@ -10,11 +10,16 @@
 Window* Application::window;
 Renderer* Application::renderer;
 
-glm::vec3 ray_color(Ray& r, Hittable& world) {
+glm::vec3 ray_color(Ray& r, Hittable& world, int depth) {
 	HitRecord rec;
 
-	if (world.hit(r, 0, infinity, rec)) {
-		return 0.5f * (rec.normal + glm::vec3(1, 1, 1));
+	if (depth <= 0)
+		return glm::vec3(0,0,0);
+
+	if (world.hit(r, 0.001f, infinity, rec)) {
+		glm::vec3 target = rec.point + rec.normal + randomInUnitSphere();
+		Ray newRay(rec.point, target - rec.point);
+		return 0.5f * ray_color(newRay, world, depth - 1);
 	}
 
 	glm::vec3 unit_direction = glm::normalize(r.direction());
@@ -28,7 +33,8 @@ void Application::setup()
 	window = new Window(scrWidth, scrHeight, "Ray Tracing");
 	renderer = new Renderer(scrWidth, scrHeight, numChannels, window->getWindowPtr());
 
-	const int samplesPerPixel = 50;
+	const int samplesPerPixel = 25;
+	const int maxDepth = 10;
 
 	HittableList world;
 	world.add(std::make_shared<Sphere>(glm::vec3(0,0,-1), 0.5));
@@ -47,7 +53,7 @@ void Application::setup()
 				auto u = (y + randomFloat()) / (scrWidth - 1);
 				auto v = (x + randomFloat()) / (scrHeight - 1);
 				Ray r = cam.getRay(u, v);
-				pixelColor += ray_color(r, world);
+				pixelColor += ray_color(r, world, maxDepth);
 			}
 
 			glm::vec4 rgba = glm::vec4(pixelColor.x, pixelColor.y, pixelColor.z, samplesPerPixel);

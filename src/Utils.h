@@ -35,3 +35,11 @@ inline static glm::vec3 random() {
 inline static glm::vec3 random(float min, float max) {
 	return glm::vec3(randomFloat(min, max), randomFloat(min, max), randomFloat(min, max));
 }
+
+static glm::vec3 randomInUnitSphere() {
+	while (true) {
+		auto p = random(-1, 1);
+		if (glm::dot(p, p) >= 1) continue;
+		return p;
+	}
+}
