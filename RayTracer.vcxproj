@@ -146,6 +146,7 @@
     <ClCompile Include="src\HittableList.cpp" />
     <ClCompile Include="src\Lambertian.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Metal.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Sphere.cpp" />

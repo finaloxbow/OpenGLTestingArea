@@ -7,6 +7,7 @@
 #include "Sphere.h"
 #include "Camera.h"
 #include "Lambertian.h"
+#include "Metal.h"
 
 Window* Application::window;
 Renderer* Application::renderer;
@@ -18,9 +19,14 @@ glm::vec3 ray_color(Ray& r, Hittable& world, int depth) {
 		return glm::vec3(0,0,0);
 
 	if (world.hit(r, 0.001f, infinity, rec)) {
-		glm::vec3 target = rec.point + rec.normal + randomInUnitSphere();
+		/*glm::vec3 target = rec.point + rec.normal + randomInUnitSphere();
 		Ray newRay(rec.point, target - rec.point);
-		return 0.5f * ray_color(newRay, world, depth - 1);
+		return 0.5f * ray_color(newRay, world, depth - 1);*/
+		glm::vec3 atten(0, 0, 0);
+		Ray scattered(atten, atten);
+		if (rec.mat_ptr->scatter(r, rec, atten, scattered))
+			return atten * ray_color(scattered, world, depth - 1);
+		return glm::vec3(0,0,0);
 	}
 
 	glm::vec3 unit_direction = glm::normalize(r.direction());
@@ -41,12 +47,17 @@ void Application::setup()
 
 	glm::vec3 groundColor(0.8f, 0.8f, 0.0f);
 	glm::vec3 centerColor(0.7f, 0.3f, 0.3f);
+	glm::vec3 leftColor(0.8f, 0.8f, 0.8f);
+	glm::vec3 rightColor(0.8f, 0.6f, 0.2f);
 	auto material_ground = new Lambertian(groundColor);
 	auto material_center = new Lambertian(centerColor);
+	auto material_left = new Metal(leftColor);
+	auto material_right = new Metal(rightColor);
 
 	world.add(std::make_shared<Sphere>(glm::vec3(0,0,-1), 0.5, material_center));
 	world.add(std::make_shared<Sphere>(glm::vec3(0, -100.5, -1), 100, material_ground));
-
+	world.add(std::make_shared<Sphere>(glm::vec3(-1.0, 0.0, -1.0), 0.5, material_left));
+	world.add(std::make_shared<Sphere>(glm::vec3(1.0, 0.0, -1.0), 0.5, material_right));
 	Camera cam(scrWidth, scrHeight);
 
 
