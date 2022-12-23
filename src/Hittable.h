@@ -2,10 +2,14 @@
 
 #include "Ray.h"
 #include <glm/glm.hpp>
+#include "Material.h"
+
+class Material;
 
 struct HitRecord {
 	glm::vec3 point;
 	glm::vec3 normal;
+	Material* mat_ptr;
 	float t;
 	bool frontFace;
 

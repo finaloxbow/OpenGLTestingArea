@@ -6,6 +6,7 @@
 #include "HittableList.h"
 #include "Sphere.h"
 #include "Camera.h"
+#include "Lambertian.h"
 
 Window* Application::window;
 Renderer* Application::renderer;
@@ -37,8 +38,14 @@ void Application::setup()
 	const int maxDepth = 10;
 
 	HittableList world;
-	world.add(std::make_shared<Sphere>(glm::vec3(0,0,-1), 0.5));
-	world.add(std::make_shared<Sphere>(glm::vec3(0, -100.5, -1), 100));
+
+	glm::vec3 groundColor(0.8f, 0.8f, 0.0f);
+	glm::vec3 centerColor(0.7f, 0.3f, 0.3f);
+	auto material_ground = new Lambertian(groundColor);
+	auto material_center = new Lambertian(centerColor);
+
+	world.add(std::make_shared<Sphere>(glm::vec3(0,0,-1), 0.5, material_center));
+	world.add(std::make_shared<Sphere>(glm::vec3(0, -100.5, -1), 100, material_ground));
 
 	Camera cam(scrWidth, scrHeight);
 
