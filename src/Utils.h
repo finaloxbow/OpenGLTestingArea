@@ -56,3 +56,11 @@ static bool nearZero(glm::vec3& v) {
 static glm::vec3 reflect(glm::vec3& v, glm::vec3& n) {
 	return v - 2.0f * glm::dot(v, n) * n;
 }
+
+static glm::vec3 refract(glm::vec3& uv, glm::vec3& n, float etai_over_etat) {
+	auto cos_theta = fmin(dot(-uv, n), 1.0f);
+	glm::vec3 rOutPerp = etai_over_etat * (uv + cos_theta*n);
+	glm::vec3 rOutPara = -sqrt(fabs(1.0f - rOutPerp.length()* rOutPerp.length())) * n;
+	
+	return rOutPerp + rOutPara;
+}

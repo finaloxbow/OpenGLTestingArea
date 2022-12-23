@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Lambertian.h"
 #include "Metal.h"
+#include "Dielectric.h"
 
 Window* Application::window;
 Renderer* Application::renderer;
@@ -44,21 +45,17 @@ void Application::setup()
 	const int maxDepth = 10;
 
 	HittableList world;
+	
+	auto R = cos(pi / 4);
+	glm::vec3 colorLeft(0,0,1);
+	glm::vec3 colorRight(1,0,0);
+	auto materialLeft = new Lambertian(colorLeft);
+	auto materialRight = new Lambertian(colorRight);
 
-	glm::vec3 groundColor(0.8f, 0.8f, 0.0f);
-	glm::vec3 centerColor(0.7f, 0.3f, 0.3f);
-	glm::vec3 leftColor(0.8f, 0.8f, 0.8f);
-	glm::vec3 rightColor(0.8f, 0.6f, 0.2f);
-	auto material_ground = new Lambertian(groundColor);
-	auto material_center = new Lambertian(centerColor);
-	auto material_left = new Metal(leftColor);
-	auto material_right = new Metal(rightColor);
+	world.add(std::make_shared<Sphere>(glm::vec3(-R, 0, -1), R, materialLeft));
+	world.add(std::make_shared<Sphere>(glm::vec3(R, 0, -1), R, materialRight));
 
-	world.add(std::make_shared<Sphere>(glm::vec3(0,0,-1), 0.5, material_center));
-	world.add(std::make_shared<Sphere>(glm::vec3(0, -100.5, -1), 100, material_ground));
-	world.add(std::make_shared<Sphere>(glm::vec3(-1.0, 0.0, -1.0), 0.5, material_left));
-	world.add(std::make_shared<Sphere>(glm::vec3(1.0, 0.0, -1.0), 0.5, material_right));
-	Camera cam(scrWidth, scrHeight);
+	Camera cam(90, 16.0f / 9.0f);
 
 
 	//filling renderer buffer

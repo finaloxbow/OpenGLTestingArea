@@ -5,13 +5,11 @@
 
 class Camera {
 public:
-	Camera(unsigned int scrWidth, unsigned int scrHeight);
+	Camera(float vfov, float aspectRatio);
 
 	Ray getRay(float u, float v);
 
 private:
-	unsigned int scrWidth;
-	unsigned int scrHeight;
 	glm::vec3 origin;
 	glm::vec3 lowerLeftCorner;
 	glm::vec3 horizontal;

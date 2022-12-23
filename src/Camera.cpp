@@ -1,9 +1,10 @@
 #include "Camera.h"
 
-Camera::Camera(unsigned int width, unsigned int height)
-: scrWidth(width), scrHeight(height) {
-    auto aspectRatio = 16.0f / 9.0f;
-    auto viewportHeight = 2.0f;
+Camera::Camera(float vFov, float aspectRatio)
+{
+    auto theta = degreesToRadians(vFov);
+    auto h = tan(theta/2);
+    auto viewportHeight = 2.0f  * h;
     auto viewportWidth = aspectRatio * viewportHeight;
     auto focalLength = 1.0f;
 

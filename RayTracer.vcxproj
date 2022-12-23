@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Dielectric.cpp" />
     <ClCompile Include="src\HittableList.cpp" />
     <ClCompile Include="src\Lambertian.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -157,6 +158,7 @@
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Dielectric.h" />
     <ClInclude Include="src\Hittable.h" />
     <ClInclude Include="src\HittableList.h" />
     <ClInclude Include="src\Lambertian.h" />
