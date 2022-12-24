@@ -57,10 +57,22 @@ static glm::vec3 reflect(glm::vec3& v, glm::vec3& n) {
 	return v - 2.0f * glm::dot(v, n) * n;
 }
 
+static float length_squared(glm::vec3& v) {
+	return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
 static glm::vec3 refract(glm::vec3& uv, glm::vec3& n, float etai_over_etat) {
 	auto cos_theta = fmin(dot(-uv, n), 1.0f);
 	glm::vec3 rOutPerp = etai_over_etat * (uv + cos_theta*n);
-	glm::vec3 rOutPara = -sqrt(fabs(1.0f - rOutPerp.length()* rOutPerp.length())) * n;
+	glm::vec3 rOutPara = -sqrt(fabs(1.0f - length_squared(rOutPerp))) * n;
 	
 	return rOutPerp + rOutPara;
+}
+
+static glm::vec3 randomInUnitDisk() {
+	while (true) {
+		auto p = glm::vec3(randomFloat(-1, 1), randomFloat(-1,1), 0);
+		if (length_squared(p) >= 1.0f) continue;
+		return p;
+	}
 }

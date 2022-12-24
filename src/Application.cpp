@@ -46,17 +46,33 @@ void Application::setup()
 
 	HittableList world;
 	
-	auto R = cos(pi / 4);
-	glm::vec3 colorLeft(0,0,1);
-	glm::vec3 colorRight(1,0,0);
-	auto materialLeft = new Lambertian(colorLeft);
-	auto materialRight = new Lambertian(colorRight);
+	glm::vec3 groundColor(0.8f,0.8f, 0.0f);
+	glm::vec3 centerColor(0.7f, 0.3f, 0.3f);
+	glm::vec3 leftColor(0.8f, 0.8f, 0.8f);
+	glm::vec3 rightColor(0.8f, 0.6f, 0.2f);
 
-	world.add(std::make_shared<Sphere>(glm::vec3(-R, 0, -1), R, materialLeft));
-	world.add(std::make_shared<Sphere>(glm::vec3(R, 0, -1), R, materialRight));
+	auto material_ground = new Lambertian(groundColor);
+	auto material_center = new Lambertian(centerColor);
+	auto material_left = new Dielectric(1.5f);
+	auto material_right = new Metal(rightColor);
 
-	Camera cam(90, 16.0f / 9.0f);
 
+	world.add(std::make_shared<Sphere>(glm::vec3(0.0, -100.5, -1.0), 100.0, material_ground));
+	world.add(std::make_shared<Sphere>(glm::vec3(0.0, 0.0, -1.0), 0.5, material_center));
+	world.add(std::make_shared<Sphere>(glm::vec3(-1.0, 0.0, -1.0), 0.5, material_left));
+	world.add(std::make_shared<Sphere>(glm::vec3(-1.0, 0.0, -1.0), -0.45, material_left));
+	world.add(std::make_shared<Sphere>(glm::vec3(1.0, 0.0, -1.0), 0.5, material_right));
+
+	
+	//TODO: create camera here
+	glm::vec3 lookfrom(3,3,2);
+	glm::vec3 lookat(0,0,-1);
+	glm::vec3 vup(0,1,0);
+	glm::vec3 focal = lookfrom - lookat;
+	auto focusDist = sqrt(length_squared(focal));
+	auto aperture = 2.0;
+
+	Camera cam(lookfrom, lookat, vup, 20, float(scrWidth) / float(scrHeight), aperture, focusDist);
 
 	//filling renderer buffer
 	//TODO: change to take framebuffer size from renderer and be
