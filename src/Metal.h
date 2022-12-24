@@ -6,7 +6,7 @@
 
 class Metal : public Material {
 public:
-	Metal(glm::vec3& a);
+	Metal(glm::vec3& a, float f);
 
 	virtual bool scatter(
 		Ray& r_in, HitRecord& rec, glm::vec3& attenuation, Ray& scattered
@@ -14,4 +14,5 @@ public:
 
 private:
 	glm::vec3 albedo;
+	float fuzz;
 };
