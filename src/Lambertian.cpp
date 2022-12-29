@@ -2,6 +2,9 @@
 #include "Utils.h"
 
 Lambertian::Lambertian(glm::vec3& a)
+: albedo(std::make_shared<SolidColor>(a)) {}
+
+Lambertian::Lambertian(std::shared_ptr<Texture> a)
 : albedo(a) {}
 
 bool Lambertian::scatter(Ray& r_in, HitRecord& rec, glm::vec3& attenuation, Ray& scattered)
@@ -13,6 +16,6 @@ bool Lambertian::scatter(Ray& r_in, HitRecord& rec, glm::vec3& attenuation, Ray&
 
 
     scattered = Ray(rec.point, scatter_direction);
-    attenuation = albedo;
+    attenuation = albedo->value(rec.u, rec.v, rec.point);
     return true;
 }

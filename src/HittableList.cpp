@@ -33,3 +33,19 @@ bool HittableList::hit(Ray& r, float tMin, float tMax, HitRecord& rec)
 
     return anyHit;
 }
+
+bool HittableList::boundingBox(float time0, float time1, AABB& outputBox)
+{
+    if (objectList.empty()) return false;
+
+    AABB tempBox;
+    bool firstBox = true;
+
+    for (auto& obj : objectList) {
+        if (!obj->boundingBox(time0, time1, tempBox)) return false;
+        outputBox = firstBox ? tempBox : AABB::surroundingBox(outputBox, tempBox);
+        firstBox = false;
+    }
+
+    return true;
+}

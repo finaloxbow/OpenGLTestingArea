@@ -9,20 +9,20 @@
 #include "Lambertian.h"
 #include "Metal.h"
 #include "Dielectric.h"
+#include "bvhNode.h"
+#include "CheckerTexture.h"
+#include "ImageTexture.h"
 
 Window* Application::window;
 Renderer* Application::renderer;
 
-glm::vec3 ray_color(Ray& r, Hittable& world, int depth) {
+glm::vec3 ray_color(Ray& r, BvhNode& world, int depth) {
 	HitRecord rec;
 
 	if (depth <= 0)
 		return glm::vec3(0,0,0);
 
 	if (world.hit(r, 0.001f, infinity, rec)) {
-		/*glm::vec3 target = rec.point + rec.normal + randomInUnitSphere();
-		Ray newRay(rec.point, target - rec.point);
-		return 0.5f * ray_color(newRay, world, depth - 1);*/
 		glm::vec3 atten(0, 0, 0);
 		Ray scattered(atten, atten);
 		if (rec.mat_ptr->scatter(r, rec, atten, scattered))
@@ -39,8 +39,10 @@ glm::vec3 ray_color(Ray& r, Hittable& world, int depth) {
 HittableList randomScene() {
 	HittableList world;
 
-	glm::vec3 groundColor(0.5f, 0.5f, 0.5f);
-	auto groundMaterial = new Lambertian(groundColor);
+	glm::vec3 even(0.2f, 0.3f, 0.1f);
+	glm::vec3 odd(0.9f, 0.9f, 0.9f);
+	auto checker = std::make_shared<CheckerTexture>(even, odd);
+	auto groundMaterial = new Lambertian(checker);
 	world.add(std::make_shared<Sphere>(glm::vec3(0, -1000, 0), 1000, groundMaterial));
 
 	for (int a = -11; a < 11; a++) {
@@ -89,16 +91,25 @@ HittableList randomScene() {
 	return world;
 }
 
+HittableList earth() {
+	auto earthTexture = std::make_shared<ImageTexture>("res/earthmap.jpg");
+	auto earthSurface = new Lambertian(earthTexture);
+	auto globe = std::make_shared<Sphere>(glm::vec3(0, 0, 0), 2, earthSurface);
+
+	return HittableList(globe);
+}
+
 void Application::setup()
 {
 	window = new Window(scrWidth, scrHeight, "Ray Tracing");
 	renderer = new Renderer(scrWidth, scrHeight, numChannels, window->getWindowPtr());
 
 	const auto aspectRatio = float(scrWidth) / float(scrHeight);
-	const int samplesPerPixel = 30;
+	const int samplesPerPixel = 50;
 	const int maxDepth = 25;
 
-	auto world = randomScene();
+	auto world = earth();
+	BvhNode bvh(world, 0, 1);
 	
 	//TODO: create camera here
 	glm::vec3 lookfrom(13,2,3);
@@ -120,7 +131,7 @@ void Application::setup()
 				auto u = (y + randomFloat()) / (scrWidth - 1);
 				auto v = (x + randomFloat()) / (scrHeight - 1);
 				Ray r = cam.getRay(u, v);
-				pixelColor += ray_color(r, world, maxDepth);
+				pixelColor += ray_color(r, bvh, maxDepth);
 			}
 
 			glm::vec4 rgba = glm::vec4(pixelColor.x, pixelColor.y, pixelColor.z, samplesPerPixel);
