@@ -1,3 +1,3 @@
-RayTracer
+OpenGL Testing Area
 
-Follows the Ray Tracing in One Weekend tutorial.
+Getting more comfortable developing in OpenGL.
