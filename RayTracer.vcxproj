@@ -118,6 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,6 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,44 +143,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\bvhNode.cpp" />
-    <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\CheckerTexture.cpp" />
-    <ClCompile Include="src\Dielectric.cpp" />
-    <ClCompile Include="src\HittableList.cpp" />
-    <ClCompile Include="src\ImageTexture.cpp" />
-    <ClCompile Include="src\Lambertian.cpp" />
-    <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Metal.cpp" />
-    <ClCompile Include="src\Ray.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
-    <ClCompile Include="src\Sphere.cpp" />
-    <ClCompile Include="src\stb_image.cpp" />
-    <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\Window.cpp" />
+    <ClCompile Include="src\entry_point.cpp" />
+    <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="vendor\glad.c" />
     <ClCompile Include="vendor\glm\detail\glm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\AABB.h" />
-    <ClInclude Include="src\Application.h" />
-    <ClInclude Include="src\bvhNode.h" />
-    <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\CheckerTexture.h" />
-    <ClInclude Include="src\Dielectric.h" />
-    <ClInclude Include="src\Hittable.h" />
-    <ClInclude Include="src\HittableList.h" />
-    <ClInclude Include="src\ImageTexture.h" />
-    <ClInclude Include="src\Lambertian.h" />
-    <ClInclude Include="src\Material.h" />
-    <ClInclude Include="src\Metal.h" />
-    <ClInclude Include="src\Ray.h" />
-    <ClInclude Include="src\Renderer.h" />
-    <ClInclude Include="src\Sphere.h" />
-    <ClInclude Include="src\Texture.h" />
-    <ClInclude Include="src\Utils.h" />
-    <ClInclude Include="src\Window.h" />
+    <ClInclude Include="src\shader.h" />
     <ClInclude Include="vendor\glad\glad.h" />
     <ClInclude Include="vendor\GLFW\glfw3.h" />
     <ClInclude Include="vendor\GLFW\glfw3native.h" />
@@ -468,6 +439,8 @@
     <ClInclude Include="vendor\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\fragment.glsl" />
+    <None Include="res\shaders\vertex.glsl" />
     <None Include="vendor\GLFW\glfw3.dll" />
     <None Include="vendor\glm\detail\func_common.inl" />
     <None Include="vendor\glm\detail\func_common_simd.inl" />
@@ -610,9 +583,6 @@
     <Library Include="vendor\GLFW\glfw3.lib" />
     <Library Include="vendor\GLFW\glfw3dll.lib" />
     <Library Include="vendor\GLFW\glfw3_mt.lib" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\earthmap.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
