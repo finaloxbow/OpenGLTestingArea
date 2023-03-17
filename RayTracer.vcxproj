@@ -143,14 +143,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\entry_point.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\std_impl.cpp" />
+    <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="vendor\glad.c" />
     <ClCompile Include="vendor\glm\detail\glm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\shader.h" />
+    <ClInclude Include="src\texture.h" />
     <ClInclude Include="vendor\glad\glad.h" />
     <ClInclude Include="vendor\GLFW\glfw3.h" />
     <ClInclude Include="vendor\GLFW\glfw3native.h" />

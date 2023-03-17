@@ -2,6 +2,9 @@
 #include <GLFW/glfw3.h>
 
 #include "shader.h"
+#include "camera.h"
+#include "texture.h"
+
 #include <stb/stb_image.h>
 
 #include <stdio.h>
@@ -19,6 +22,13 @@
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
 
+//MAKE CAMERA HERE!!
+float last_x = SCR_WIDTH / 2.0f;
+float last_y = SCR_HEIGHT / 2.0f;
+camera cam;
+bool first_mouse = true;
+float delta_time = 0.0f;
+float last_frame = 0.0f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -27,6 +37,38 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cam.process_keyboard(camera::CAMERA_MOVEMENT::FORWARD, delta_time);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cam.process_keyboard(camera::CAMERA_MOVEMENT::BACKWARD, delta_time);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cam.process_keyboard(camera::CAMERA_MOVEMENT::LEFT, delta_time);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cam.process_keyboard(camera::CAMERA_MOVEMENT::RIGHT, delta_time);
+}
+
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
+	float xpos = static_cast<float>(xposIn);
+	float ypos = static_cast<float>(yposIn);
+
+	if (first_mouse) {
+		last_x = xposIn;
+		last_y = yposIn;
+		first_mouse = false;
+	}
+
+	float xoffset = xpos - last_x;
+	float yoffset = last_y - ypos;
+
+	last_x = xpos;
+	last_y = ypos;
+
+	cam.process_mouse_movement(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+	cam.process_mouse_scroll(static_cast<float>(yoffset));
 }
 
 float vertices[] = {
@@ -104,9 +146,13 @@ int main() {
 		throw "Window creation failed.";
 	}
 
-	//set framebuffer callback function
+	//make opengl context and set callback functions
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		throw "OpenGL init failed.";
@@ -127,49 +173,13 @@ int main() {
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	//---generating a texture
-	unsigned int texture1;
-	glGenTextures(1, &texture1);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-
-	//texture wrapping/filtering options
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	//read image from file into texture
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("res/images/map.jpg", &width, &height, &nrChannels, 0);
-	if (!data)
-		throw "Failed to load texture1.";
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	//free image data after use
-	stbi_image_free(data);
-
-	//---load second texture
-	unsigned int texture2;
-	glGenTextures(1, &texture2);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	data = stbi_load("res/images/fourtwenty.jpg", &width, &height, &nrChannels, 0);
-	if (!data)
-		throw "Failed to load texture2.";
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
 	
+	//load textures
+	texture tex1(GL_TEXTURE0);
+	tex1.load_img_into_texture("res/images/map.jpg", GL_RGB, GL_RGB);
+	texture tex2(GL_TEXTURE1);
+	tex2.load_img_into_texture("res/images/fourtwenty.jpg", GL_RGB, GL_RGB);
+
 	//position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -177,8 +187,17 @@ int main() {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	shader_program.use();
+
+	//set texture units for samplers
+	shader_program.set_int("texture1", 0);
+	shader_program.set_int("texture2", 1);
 
 	while (!glfwWindowShouldClose(window)) {
+
+		float current_frame = static_cast<float>(glfwGetTime());
+		delta_time = current_frame - last_frame;
+		last_frame = current_frame;
 
 		processInput(window);
 
@@ -186,27 +205,21 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		tex1.use();
+		tex2.use();
+
 		shader_program.use();
 
-		//set texture units for samplers
-		shader_program.set_int("texture1", 0);
-		shader_program.set_int("texture2", 1);
+		glm::mat4 proj = glm::perspective(
+			glm::radians(cam.m_zoom), 
+			(float)SCR_WIDTH / (float)SCR_HEIGHT, 
+			0.1f, 
+			100.f
+		);
+		shader_program.set_fmat4("proj", proj);
 
-		//calculate transform matrix
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		shader_program.set_fmat4("transform", model);
-
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -0.5f));
+		glm::mat4 view = cam.get_view_matrix();
+		shader_program.set_fmat4("view", view);
 
 		//rendering done here
 		glBindVertexArray(VAO);
@@ -216,13 +229,10 @@ int main() {
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-
-			glm::mat4 trans = projection * view * model;
-			shader_program.set_fmat4("transform", trans);
+			shader_program.set_fmat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
