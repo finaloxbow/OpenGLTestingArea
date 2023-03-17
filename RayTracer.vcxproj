@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="src\entry_point.cpp" />
     <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\std_impl.cpp" />
     <ClCompile Include="vendor\glad.c" />
     <ClCompile Include="vendor\glm\detail\glm.cpp" />
   </ItemGroup>
@@ -583,6 +584,10 @@
     <Library Include="vendor\GLFW\glfw3.lib" />
     <Library Include="vendor\GLFW\glfw3dll.lib" />
     <Library Include="vendor\GLFW\glfw3_mt.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\images\fourtwenty.jpg" />
+    <Image Include="res\images\map.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

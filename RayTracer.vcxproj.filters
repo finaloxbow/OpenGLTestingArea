@@ -27,6 +27,9 @@
     <ClCompile Include="src\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\std_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vendor\GLFW\glfw3.h">
@@ -1311,5 +1314,13 @@
     <Library Include="vendor\GLFW\glfw3.lib" />
     <Library Include="vendor\GLFW\glfw3_mt.lib" />
     <Library Include="vendor\GLFW\glfw3dll.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\images\map.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\images\fourtwenty.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
