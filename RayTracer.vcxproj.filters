@@ -27,13 +27,19 @@
     <ClCompile Include="src\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\std_impl.cpp">
+    <ClCompile Include="src\stb_impl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vbo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vao.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -908,6 +914,15 @@
     <ClInclude Include="src\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\vao.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vbo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vbo_layout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="vendor\GLFW\glfw3.dll" />
@@ -1321,6 +1336,8 @@
     </None>
     <None Include="res\shaders\vertex.glsl" />
     <None Include="res\shaders\fragment.glsl" />
+    <None Include="res\shaders\light_vertex.glsl" />
+    <None Include="res\shaders\light_fragment.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="vendor\GLFW\glfw3.lib" />
